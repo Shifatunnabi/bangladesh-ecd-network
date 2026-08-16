@@ -8,6 +8,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import Image from "next/image"
 import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, X } from "lucide-react"
 import { ProcessedGallery } from "@/lib/contentful-types"
+import { getYouTubeEmbedUrl } from "@/lib/youtube"
 import {
   Pagination,
   PaginationContent,
@@ -215,13 +216,19 @@ export function GalleryClient({ initialGalleryEvents }: GalleryClientProps) {
                 /* Video Card */
                 <div key={event.id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                   <div className="aspect-video bg-black">
-                    <iframe
-                      src={event.youtubeLink.replace('watch?v=', 'embed/')}
-                      title={event.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full h-full"
-                    />
+                    {getYouTubeEmbedUrl(event.youtubeLink) ? (
+                      <iframe
+                        src={getYouTubeEmbedUrl(event.youtubeLink)!}
+                        title={event.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                        <p className="text-muted-foreground text-sm">Invalid video URL</p>
+                      </div>
+                    )}
                   </div>
                   <div className="p-4">
                     <h3 className="text-lg font-semibold">{event.title}</h3>

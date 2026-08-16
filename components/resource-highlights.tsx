@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Calendar, Download, Play, ExternalLink, FileText } from "lucide-react"
 import type { ProcessedResearch, ProcessedVoice, ProcessedNewsletter, ProcessedPolicyLink } from "@/lib/contentful-types"
+import { getYouTubeThumbnail } from "@/lib/youtube"
 
 interface ResourceHighlightsProps {
   latestResearch: ProcessedResearch | null;
@@ -14,17 +15,6 @@ interface ResourceHighlightsProps {
 }
 
 export function ResourceHighlights({ latestResearch, latestVoice, latestNewsletter, latestPolicy }: ResourceHighlightsProps) {
-  // Helper function to extract YouTube thumbnail
-  const getYouTubeThumbnail = (url: string): string => {
-    if (!url) return "/images/resources/video-thumbnail.jpg";
-    
-    const videoId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=))([^?&]+)/);
-    if (videoId && videoId[1]) {
-      return `https://img.youtube.com/vi/${videoId[1]}/mqdefault.jpg`;
-    }
-    return "/images/resources/video-thumbnail.jpg";
-  };
-
   const resources = [
     latestResearch ? {
       type: "Research Report",
@@ -40,7 +30,7 @@ export function ResourceHighlights({ latestResearch, latestVoice, latestNewslett
       type: "Video Resource",
       title: latestVoice.title,
       date: "Recent",
-      image: getYouTubeThumbnail(latestVoice.videoUrl),
+      image: getYouTubeThumbnail(latestVoice.videoUrl, "/images/resources/video-thumbnail.jpg"),
       badge: "Featured",
       href: `/resources/voices`,
       action: "Watch Video",

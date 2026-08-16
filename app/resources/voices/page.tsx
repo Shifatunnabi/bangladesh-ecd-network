@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card"
 import { getAllVoices, transformVoice } from "@/lib/contentful"
+import { getYouTubeEmbedUrl } from "@/lib/youtube"
 
 // Enable ISR - Revalidate every 60 seconds
 export const revalidate = 60;
@@ -12,28 +13,6 @@ async function getVoices() {
     console.error('Error fetching voices:', error)
     return []
   }
-}
-
-// Helper function to extract YouTube video ID from various URL formats
-function getYouTubeVideoId(url: string): string | null {
-  if (!url) return null
-  
-  // Handle youtu.be short links
-  const shortLinkMatch = url.match(/youtu\.be\/([^?]+)/)
-  if (shortLinkMatch) return shortLinkMatch[1]
-  
-  // Handle standard youtube.com links
-  const longLinkMatch = url.match(/[?&]v=([^&]+)/)
-  if (longLinkMatch) return longLinkMatch[1]
-  
-  // Handle embed links
-  const embedMatch = url.match(/embed\/([^?]+)/)
-  if (embedMatch) return embedMatch[1]
-  
-  // If it's already just an ID
-  if (url.length === 11 && !url.includes('/')) return url
-  
-  return null
 }
 
 export default async function VoicesPage() {
@@ -65,14 +44,14 @@ export default async function VoicesPage() {
         {voices.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {voices.map((voice) => {
-              const videoId = getYouTubeVideoId(voice.videoUrl)
-              
+              const embedUrl = getYouTubeEmbedUrl(voice.videoUrl)
+
               return (
                 <Card key={voice.id} className="overflow-hidden">
                   <div className="aspect-video">
-                    {videoId ? (
+                    {embedUrl ? (
                       <iframe
-                        src={`https://www.youtube.com/embed/${videoId}`}
+                        src={embedUrl}
                         title={voice.title}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen

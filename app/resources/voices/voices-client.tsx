@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { ProcessedVoice } from "@/lib/contentful-types"
+import { getYouTubeEmbedUrl } from "@/lib/youtube"
 import {
   Pagination,
   PaginationContent,
@@ -18,24 +19,6 @@ interface VoicesClientProps {
 }
 
 const ITEMS_PER_PAGE = 12
-
-// Helper function to extract YouTube video ID from various URL formats
-function getYouTubeVideoId(url: string): string | null {
-  if (!url) return null
-  
-  const shortLinkMatch = url.match(/youtu\.be\/([^?]+)/)
-  if (shortLinkMatch) return shortLinkMatch[1]
-  
-  const longLinkMatch = url.match(/[?&]v=([^&]+)/)
-  if (longLinkMatch) return longLinkMatch[1]
-  
-  const embedMatch = url.match(/embed\/([^?]+)/)
-  if (embedMatch) return embedMatch[1]
-  
-  if (url.length === 11 && !url.includes('/')) return url
-  
-  return null
-}
 
 export function VoicesClient({ voices }: VoicesClientProps) {
   const [currentPage, setCurrentPage] = useState(1)
@@ -101,14 +84,14 @@ export function VoicesClient({ voices }: VoicesClientProps) {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {currentVoices.map((voice) => {
-              const videoId = getYouTubeVideoId(voice.videoUrl)
-              
+              const embedUrl = getYouTubeEmbedUrl(voice.videoUrl)
+
               return (
                 <Card key={voice.id} className="overflow-hidden">
                   <div className="aspect-video">
-                    {videoId ? (
+                    {embedUrl ? (
                       <iframe
-                        src={`https://www.youtube.com/embed/${videoId}`}
+                        src={embedUrl}
                         title={voice.title}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
